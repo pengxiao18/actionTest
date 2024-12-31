@@ -26,8 +26,14 @@ jobs:
         - uses: gradle/gradle-build-action@v2
           with:
             gradle-version: current
+            #arguments: bundleRelease
+            arguments: assembleRelease
+
+        # 设置gradle环境(比如: 6.5)、打包命令
+        - uses: gradle/gradle-build-action@v2
+          with:
+            gradle-version: current
             arguments: bundleRelease
-            #arguments: assembleRelease
 
         # 签名apk
         - uses: r0adkll/sign-android-release@v1
@@ -59,13 +65,46 @@ jobs:
             # override default build-tools version (29.0.3) -- optional
             BUILD_TOOLS_VERSION: "35.0.0"
 
+        # 签名 bundle
+        - uses: r0adkll/sign-android-release@v1
+          name: Sign app google bundle
+          id: sign_app_google_bundle
+          with:
+            releaseDirectory: app/build/outputs/bundle/googleRelease
+            signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+            alias: ${{ secrets.ALIAS }}
+            keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+            keyPassword: ${{ secrets.KEY_PASSWORD }}
+          # 还能设置build-tools version，29.0.3好像不支持了
+          env:
+            # override default build-tools version (29.0.3) -- optional
+            BUILD_TOOLS_VERSION: "35.0.0"
+
+        # 签名 bundle
+        - uses: r0adkll/sign-android-release@v1
+          name: Sign app main bundle
+          id: sign_app_main_bundle
+          with:
+            releaseDirectory: app/build/outputs/bundle/mainStoreRelease
+            signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+            alias: ${{ secrets.ALIAS }}
+            keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+            keyPassword: ${{ secrets.KEY_PASSWORD }}
+          # 还能设置build-tools version，29.0.3好像不支持了
+          env:
+            # override default build-tools version (29.0.3) -- optional
+            BUILD_TOOLS_VERSION: "35.0.0"
+
         #- run: mv ${{steps.sign_app.outputs.signedReleaseFile}} LittleGooseOffice_$GITHUB_REF_NAME.apk
         - run: mv ${{steps.sign_app_google.outputs.signedReleaseFile}} .
         - run: mv ${{steps.sign_app_main.outputs.signedReleaseFile}} .
 
+        - run: mv ${{steps.sign_app_google_bundle.outputs.signedReleaseFile}} .
+        - run: mv ${{steps.sign_app_main_bundle.outputs.signedReleaseFile}} .
+
         - uses: ncipollo/release-action@v1
           with:
-            artifacts: "*.apk", "*.aab"
+            artifacts: "*.apk, *.aab"
             token: ${{ github.token }}
             generateReleaseNotes: true
 
