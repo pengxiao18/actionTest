@@ -59,6 +59,9 @@ jobs:
             BUILD_TOOLS_VERSION: "35.0.0"
 
         #- run: mv ${{steps.sign_app.outputs.signedReleaseFile}} LittleGooseOffice_$GITHUB_REF_NAME.apk
+        - run: mv ${{steps.sign_app_google.outputs.signedReleaseFile}} .
+        - run: mv ${{steps.sign_app_main.outputs.signedReleaseFile}} .
+
         - uses: ncipollo/release-action@v1
           with:
             artifacts: "*.apk"
