@@ -1,8 +1,10 @@
 name: package Android
 on:
   push:
-    branches:
-      - master
+    #branches:
+    #  - master
+    tags:
+      - "v*"
 
 jobs:
     builds:
