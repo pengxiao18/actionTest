@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+def releaseType = project.hasProperty("RELEASE_TYPE") ? RELEASE_TYPE : ""
+
 android {
     namespace 'com.xupx.action.testaction'
     compileSdk 35
@@ -36,9 +38,17 @@ android {
     }
 
     productFlavors {
-        google {
-        }
-        mainStore {
+        if (releaseType == "apk") {
+            mainStore {
+            }
+            official {
+            }
+        } else if (releaseType == "aab"){
+            google {
+            }
+        } else {
+            local {
+            }
         }
     }
 }
