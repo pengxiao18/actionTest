@@ -1,0 +1,52 @@
+name: package
+
+on:
+  push:
+    - master
+
+jobs:
+    builds:
+      runs-on: ubuntu-latest
+
+      permissions:
+        contents: write
+
+      steps:
+        # 拉取仓库代码
+        - uses: actions/checkout@v3
+          # 设置Java运行环境，可以设置为: 1.8
+        - uses: actions/setup-java@v3
+          with:
+            distribution: temurin
+            java-version: 11
+
+          # 设置gradle环境(比如: 6.5)、打包命令
+        - uses: gradle/gradle-build-action@v2
+          with:
+            gradle-version: current
+            arguments: assembleRelease
+
+        # 签名apk
+        - uses: r0adkll/sign-android-release@v1
+          name: Sign app APK
+          id: sign_app
+          with:
+            releaseDirectory: app/build/outputs/apk/release
+            signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+            alias: ${{ secrets.ALIAS }}
+            keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+            keyPassword: ${{ secrets.KEY_PASSWORD }}
+          # 还能设置build-tools version，29.0.3好像不支持了
+          env:
+            # override default build-tools version (29.0.3) -- optional
+            BUILD_TOOLS_VERSION: "34.0.0"
+
+        - run: mv ${{steps.sign_app.outputs.signedReleaseFile}} LittleGooseOffice_$GITHUB_REF_NAME.apk
+        - uses: ncipollo/release-action@v1
+          with:
+            artifacts: "*.apk"
+            token: ${{ github.token }}
+            generateReleaseNotes: true
+
+
+
