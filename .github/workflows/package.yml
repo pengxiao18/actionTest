@@ -1,8 +1,8 @@
-name: package
-
+name: package Android
 on:
   push:
-    - master
+    branches:
+      - master
 
 jobs:
     builds:
