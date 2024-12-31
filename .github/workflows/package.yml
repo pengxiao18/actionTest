@@ -26,7 +26,8 @@ jobs:
         - uses: gradle/gradle-build-action@v2
           with:
             gradle-version: current
-            arguments: assembleRelease
+            arguments: bundleRelease
+            #arguments: assembleRelease
 
         # 签名apk
         - uses: r0adkll/sign-android-release@v1
@@ -64,7 +65,7 @@ jobs:
 
         - uses: ncipollo/release-action@v1
           with:
-            artifacts: "*.apk"
+            artifacts: "*.apk", "*.aab"
             token: ${{ github.token }}
             generateReleaseNotes: true
 
