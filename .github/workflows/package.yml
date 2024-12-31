@@ -30,10 +30,25 @@ jobs:
 
         # 签名apk
         - uses: r0adkll/sign-android-release@v1
-          name: Sign app APK
-          id: sign_app
+          name: Sign app APK google
+          id: sign_app_google
           with:
-            releaseDirectory: app/build/outputs/apk/release
+            releaseDirectory: app/build/outputs/apk/google/release
+            signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+            alias: ${{ secrets.ALIAS }}
+            keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+            keyPassword: ${{ secrets.KEY_PASSWORD }}
+          # 还能设置build-tools version，29.0.3好像不支持了
+          env:
+            # override default build-tools version (29.0.3) -- optional
+            BUILD_TOOLS_VERSION: "35.0.0"
+
+        # 签名apk
+        - uses: r0adkll/sign-android-release@v1
+          name: Sign app APK main
+          id: sign_app_main
+          with:
+            releaseDirectory: app/build/outputs/apk/mainStore/release
             signingKeyBase64: ${{ secrets.SIGNING_KEY }}
             alias: ${{ secrets.ALIAS }}
             keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
